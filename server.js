@@ -1,5 +1,5 @@
 'use strict';
-console.log('server.js is connected!!!');
+console.log('HERE WE GO server.js is connected!!!');
 
 
 
@@ -21,11 +21,47 @@ const axios = require('axios');
 const app = express();
 app.use(cors());
 const PORT = process.env.PORT || 3002;
+
+
+
 //ROUTES
 app.get('/', (req, res) => {
   res.status(200).send('Hello from the server! Have a great day!');
 });
+
+//search the animals
+app.get('/photos', async (req, res) => {
+  //front end will send value for a search for photos
+  let searchQueryFromFrontEnd = req.query.searchQuery;
+  //then take that value to use it to construct a URL to make a request to the API
+  let url =`https://api.unsplash.com/search/photos/?client_id=${process.env.UNSLASH_API_KEY}&query=${searchQueryFromFrontEnd}`;
+
+  let results = await axios.get(url);
+   console.log('!!!!!!!!!!!!!!!!!',results.data);
+  
+  res.status(200).send('hi');
+});
+
+
+
+app.get('*', (req, res) => {
+  res.status(404).send('These are not the droids your looking 404');
+});
+
+
+
+
+
 //CLASSES
+
+
 //ERRORS
+// eslint-disable-next-line no-unused-vars
+app.use((error, req, res, next) =>{
+  console.log(error.message);
+  res.status(500).send(error.message);
+});
+
+
 //LISTEN
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
