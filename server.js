@@ -30,16 +30,21 @@ app.get('/', (req, res) => {
 });
 
 //search the animals
-app.get('/photos', async (req, res) => {
-  //front end will send value for a search for photos
+app.get('/photos', async (req, res, next) => {
+  try{
+      //front end will send value for a search for photos
   let searchQueryFromFrontEnd = req.query.searchQuery;
   //then take that value to use it to construct a URL to make a request to the API
   let url =`https://api.unsplash.com/search/photos/?client_id=${process.env.UNSLASH_API_KEY}&query=${searchQueryFromFrontEnd}`;
-
   let results = await axios.get(url);
    console.log('!!!!!!!!!!!!!!!!!',results.data);
-  
-  res.status(200).send('hi');
+  let pictureInstance = results.data.results.map((pic) => new Photos(pic));
+  res.status(200).send(pictureInstance);
+
+  } catch(error){
+    next(error);
+  }
+
 });
 
 
@@ -53,6 +58,14 @@ app.get('*', (req, res) => {
 
 
 //CLASSES
+class Photos {
+  constructor(picture){
+    this.src = picture.urls.regular;
+    this.alt = picture.alt_description;
+    this.artist = picture.user.name;
+  }
+}
+// http://localhost:3001/photos?searchQuery=kittens
 
 
 //ERRORS
